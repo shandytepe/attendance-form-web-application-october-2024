@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  app-absensi-2:
+    image: python:3.10-slim
+    container_name: app-absensi-container-2
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    restart: always
+    ports:
+      - 5001:5000
+    entrypoint: ["sh", "-c", "pip install -r requirements.txt && python app.py"]
+    env_file:
+      - .env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - absensi
+
+  database-absensi-2:
+    container_name: database-absensi-container-2
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5435:5432
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - absensi
+
+networks:
+  absensi:
+
+volumes:
+  pgdata:
